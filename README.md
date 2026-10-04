@@ -1,6 +1,5 @@
 # VizDL: Visual Design Language
 
-> **Scientifically Artistic Visual Modeling and Physical Synthesis**
 
 [![Specification](https://img.shields.io/badge/spec-v1.0-blue.svg)](SPECIFICATION.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
