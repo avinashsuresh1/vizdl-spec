@@ -1,0 +1,9 @@
+name = "cylinder"
+description = "Cylindrical column swept along a straight path"
+surface = "circle"
+material = "mirror_metal"
+
+[path]
+mode = "sweep"
+curve = "straight_line"
+caps = "both"

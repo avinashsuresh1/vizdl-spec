@@ -1,0 +1,5 @@
+name = "glossy_crimson"
+description = "Bulk scattering opaque polymer with selective blue-absorption cutoff"
+energy_gap = 0.22
+electron_density = 0.65
+roughness = 0.15

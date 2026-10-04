@@ -1,0 +1,9 @@
+name = "excitation_pulse"
+description = "Quantum excitation pulse from ground state to radiant peak"
+duration = 4.0
+loop = true
+
+[excitation]
+start = 0.2
+end = 1.0
+timing = "ease_in_out"

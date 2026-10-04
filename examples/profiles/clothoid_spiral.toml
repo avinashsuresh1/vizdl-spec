@@ -1,0 +1,5 @@
+name = "clothoid_spiral"
+description = "Euler spiral with linear curvature transition"
+start_point = [0.0, 0.0, 0.0]
+end_point = [5.0, 2.5, 0.0]
+curvature = [0.0, 0.2]

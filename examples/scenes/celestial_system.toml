@@ -1,0 +1,25 @@
+name = "celestial_system"
+description = "A self-illuminating stellar system with an orbiting probe"
+duration = 10.0
+fps = 60.0
+loop = true
+
+[camera]
+position = [0.0, 8.0, 16.0]
+target = [0.0, 0.0, 0.0]
+fov = 50.0
+
+# Central self-illuminating sun (light source)
+[[objects]]
+name = "sun"
+object = "celestial_sun"
+position = [0.0, 0.0, 0.0]
+animation = "excitation_pulse"
+
+# Orbiting satellite illuminated by the sun
+[[objects]]
+name = "probe"
+object = "satellite"
+position = [0.0, 0.0, 0.0]
+animation = "orbital_spin"
+start_time = 0.0

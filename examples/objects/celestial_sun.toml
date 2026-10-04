@@ -1,0 +1,9 @@
+name = "celestial_sun"
+description = "A radiant stellar body"
+
+[[components]]
+name = "core"
+mesh = "revolved_sphere"
+material = "radiant_sun"
+position = [0.0, 0.0, 0.0]
+scale = 2.0

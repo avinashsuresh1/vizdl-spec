@@ -1,0 +1,5 @@
+name = "dielectric_glass"
+description = "Pure optical glass with wide bandgap and low electron density"
+energy_gap = 0.95
+electron_density = 0.36
+roughness = 0.02

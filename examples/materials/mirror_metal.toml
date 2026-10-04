@@ -1,0 +1,5 @@
+name = "mirror_metal"
+description = "Polished conductor with high Drude plasma reflectance"
+energy_gap = 0.01
+electron_density = 0.95
+roughness = 0.04

@@ -1,0 +1,6 @@
+name = "radiant_sun"
+description = "Active matter with maximum quantum electronic pumping"
+energy_gap = 0.88
+electron_density = 0.40
+roughness = 0.20
+excitation = 1.0

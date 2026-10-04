@@ -1,0 +1,11 @@
+name = "orbital_spin"
+description = "Smooth 360-degree orbit around the central Y axis"
+duration = 10.0
+loop = true
+
+[motion]
+mode = "revolve"
+axis = "y"
+angle = 360.0
+offset = 6.0
+timing = "linear"
