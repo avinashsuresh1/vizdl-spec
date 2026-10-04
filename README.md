@@ -33,7 +33,7 @@
   - [`docs/objects.md`](docs/objects.md): Hierarchical assemblies and motor positioning.
   - [`docs/animations.md`](docs/animations.md): The 4 pillars of motion and pacing curves.
   - [`docs/scenes.md`](docs/scenes.md): Scene timelines, director cameras, and self-illuminating worlds.
-- **[`examples/`](examples/)**: Working, verified TOML project files ready to render.
+- **[`examples/`](examples/)**: Sample VizDL projects.
 
 ---
 
