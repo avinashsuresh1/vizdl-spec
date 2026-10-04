@@ -4,11 +4,7 @@ Scenes define the master director timeline, camera placement, and placed object 
 
 ---
 
-## 1. Physical Environment Architecture
-
-In traditional 3D graphics, a scene must declare an artificial rig of invisible lights (`AmbientLight`, `DirectionalLight`, `PointLight`).
-
-In VizDL, **there are no separate light primitives**. All illumination radiates directly from objects in the scene whose materials have positive excitation ($\epsilon > 0.0$). A scene consists solely of:
+In VizDL, illumination radiates directly from objects in the scene whose materials have positive excitation ($\epsilon > 0.0$). There are no separate light primitives. A scene consists solely of:
 1. Master timeline and clock settings.
 2. The director camera.
 3. Placed object instances.

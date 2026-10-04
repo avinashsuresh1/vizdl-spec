@@ -1,238 +1,198 @@
-# Principles of VizDL
+# Principles of VizDL (Version 1.0)
 
-Authoritative theoretical and physical foundations of the Visual Design Language (VizDL).
-
----
-
-## 1. Executive Thesis: Scientifically Artistic
-
-Traditional computer graphics tools and format standards (OBJ, FBX, glTF, USD) treat visual modeling as an imperative, ad-hoc assembly of arbitrary polygon meshes, heuristic RGB vertex paints, empirical Lambert/Phong lighting parameters, and Euler-angle animation keyframes. These legacy abstractions suffer from fundamental mathematical and physical defects:
-
-1. **Gimbal Lock & Coordinate Fragility**: Euler angle representations ($\alpha, \beta, \gamma$) possess coordinate singularities and cannot compose smoothly without matrix conversions and quaternion workarounds.
-2. **Unphysical Optics & Energy Leaks**: Assigning arbitrary RGB diffuse colors decoupled from reflectance violates the First and Second Laws of Thermodynamics ($R + T + A \neq 1.0$), resulting in rubbery, washed-out, or physically impossible renderings.
-3. **Synthetic "Light" Hacks**: Treating luminaires as weightless, invisible geometric points or cones floating in a vacuum divorces illumination from matter.
-4. **Ad-Hoc Curve Primitives**: Segmenting curves into artificial types—lines, circular arcs, quadratic Béziers, cubic Béziers, NURBS—creates continuous curvature ($G^2$) discontinuities and makes smooth sweeping unstable.
-
-**VizDL unifies visual design through condensed-matter physics and coordinate-free Geometric Algebra.** Geometry is defined by intrinsic curvature; matter is governed by electron density and quantum bandgaps; light is excited matter; and motion is governed by four geometric and quantum transformations.
-
-```
-                           +---------------------------+
-                           |  Intrinsic Profile kappa  |
-                           +-------------+-------------+
-                                         |
-                                         v
-                         +-------------------------------+
-                         |   Mesh (Sweep / Revolve)      |
-                         +---------------+---------------+
-                                         |
-                                         v
-+------------------------+       +-------+-------+       +------------------------+
-| Physical Triad (Eg,pe) | ----> | Object Comp.  | <---- | Kinematics (M = T R)   |
-+------------------------+       +-------+-------+       +------------------------+
-                                         |
-                                         v
-                         +-------------------------------+
-                         | Scene Timeline & Self-Glow    |
-                         +-------------------------------+
-```
+This document formalizes the mathematical and physical foundations of the Visual Design Language (VizDL).
 
 ---
 
-## 2. Principle I: Intrinsic Curvature Geometry
+## 1. Overview
 
-In VizDL, curves are **never** declared via ad-hoc primitives such as `line`, `arc`, or `bezier`. Every 1D profile, 2D cross-section, 3D sweep path, and temporal easing curve is expressed in coordinate-free intrinsic geometry:
+VizDL is a declarative visual modeling system founded on two core formalisms:
+1. **Coordinate-free geometry and kinematics** via intrinsic curvature profiles and 3D Clifford Geometric Algebra $Cl(3,0)$.
+2. **First-principles optical physics** via a normalized condensed-matter parameter triad $(E_g, \rho_e, \sigma)$ governed by thermodynamic energy conservation and resonant electronic excitation $\epsilon$.
 
-$$\kappa(s) = \sum_{k=0}^n a_k s^k$$
+```
++---------------------------+       +---------------------------+
+| Intrinsic Curvature kappa |       | Geometric Algebra Cl(3,0) |
++-------------+-------------+       +-------------+-------------+
+              |                                   |
+              v                                   v
++---------------------------+       +---------------------------+
+|   Parametric Surfaces     |       |    Rotors and Motors      |
+|    (Sweep / Revolve)      |       |      ( M = T R )          |
++-------------+-------------+       +-------------+-------------+
+              |                                   |
+              +-----------------+-----------------+
+                                |
+                                v
+               +---------------------------------+
+               |   Object Assembly Composition   |
+               +----------------+----------------+
+                                |
+              +-----------------+-----------------+
+              |                                   |
+              v                                   v
++-------------------------------+   +---------------------------+
+|    Condensed-Matter Triad     |   |   The 4 Kinematic Pillars |
+| (Eg, rho_e, sigma) + Excitation | | (Sweep, Revolve, Morph,   |
+|   Energy: R + T + A = 1.0     |   |        Excitation)        |
++-------------------------------+   +---------------------------+
+```
 
-where $s \in [0, L]$ is the arc length parameter, and $\kappa(s)$ is the signed curvature.
+---
 
-### The Frenet-Serret Moving Frame
+## 2. Geometric Model: Intrinsic Curvature Profiles
 
-For any smooth curve $\mathbf{r}(s)$ parametrized by arc length $s$, the local moving frame is defined by orthonormal vectors:
-- Tangent: $\mathbf{T}(s) = \frac{d\mathbf{r}}{ds}$
-- Normal: $\mathbf{N}(s) = \frac{1}{\kappa(s)} \frac{d\mathbf{T}}{ds}$
-- Binormal: $\mathbf{B}(s) = \mathbf{T}(s) \times \mathbf{N}(s)$
+In VizDL, curves are not defined by extrinsic control points. Instead, every curve is formulated as an intrinsic parametric curve defined by signed curvature $\kappa(s)$ along its arc length $s \in [0, L]$:
 
-The Frenet-Serret differential equations govern the spatial evolution:
+$$\kappa(s) = \sum_{k=0}^n a_k s^k = a_0 + a_1 s + a_2 s^2 + \dots$$
+
+### 2.1 The Frenet-Serret Moving Frame
+
+For any smooth space curve $\mathbf{r}(s)$ parametrized by arc length $s$, the local moving frame consists of orthonormal vectors:
+- **Tangent vector**: $\mathbf{T}(s) = \frac{d\mathbf{r}}{ds}$
+- **Normal vector**: $\mathbf{N}(s) = \frac{1}{\kappa(s)} \frac{d\mathbf{T}}{ds}$
+- **Binormal vector**: $\mathbf{B}(s) = \mathbf{T}(s) \times \mathbf{N}(s)$
+
+The evolution of the moving frame along arc length is governed by the differential system:
 $$\frac{d}{ds} \begin{pmatrix} \mathbf{T} \\ \mathbf{N} \\ \mathbf{B} \end{pmatrix} = \begin{pmatrix} 0 & \kappa(s) & 0 \\ -\kappa(s) & 0 & \tau(s) \\ 0 & -\tau(s) & 0 \end{pmatrix} \begin{pmatrix} \mathbf{T} \\ \mathbf{N} \\ \mathbf{B} \end{pmatrix}$$
 
-### Geometric Realizations of $\kappa(s)$
+### 2.2 Curvature Classes
 
-1. **Straight Line**:
-   $$\kappa(s) = 0.0 \implies \mathbf{r}(s) = \mathbf{r}_0 + s \mathbf{T}_0$$
-2. **Circular Arc / Full Circle**:
-   $$\kappa(s) = c \quad (c \neq 0) \implies R = \frac{1}{|c|}$$
-   If `end_point` is omitted, the profile automatically evaluates to a closed, periodic circle of circumference $L = 2\pi R = \frac{2\pi}{|c|}$.
-3. **Euler Spiral (Clothoid)**:
-   $$\kappa(s) = a_1 s \implies \theta(s) = \int_0^s \kappa(u) du = \frac{1}{2} a_1 s^2$$
-   The tangent angle varies quadratically with arc length. This provides continuous curvature continuity ($G^2$), completely eliminating curvature shock at transitions.
+1. **Straight Line ($\kappa(s) = 0.0$)**:
+   $$\mathbf{r}(s) = \mathbf{r}_0 + s \mathbf{T}_0$$
+2. **Circular Arc / Full Circle ($\kappa(s) = c \neq 0$)**:
+   Constant curvature yields a circle of radius $R = \frac{1}{|c|}$. When the end coordinate is omitted, the domain evaluates over the periodic closed interval $s \in [0, 2\pi R]$.
+3. **Euler Spiral / Clothoid ($\kappa(s) = a_1 s$)**:
+   Curvature varies linearly with arc length. The turning angle is quadratic:
+   $$\theta(s) = \int_0^s \kappa(u) du = \frac{1}{2} a_1 s^2$$
+   This yields continuous curvature ($G^2$ continuity) along transitions.
 4. **General Polynomial Curves**:
-   Arbitrary complex organic paths, airfoils, and camera tracks are realized through higher-order curvature terms without control point manipulation.
+   Higher-order curvature terms represent continuous, smooth path trajectories and cross-sections without piecewise control polygon manipulation.
 
 ---
 
-## 3. Principle II: 3D Geometric Algebra $Cl(3,0)$
+## 3. Spatial Transformation Model: 3D Geometric Algebra $Cl(3,0)$
 
-VizDL rejects $3 \times 3$ Euler rotation matrices and quaternions in favor of 3D Geometric Algebra (Clifford Algebra $Cl(3,0)$).
+Spatial rotations and rigid body motions are formulated in Clifford Geometric Algebra $Cl(3,0)$ rather than Euler angles or rotation matrices.
 
-### Multivector Basis
+### 3.1 Graded Multivector Space
 
-The algebra is generated by three orthonormal spatial basis vectors $\{e_1, e_2, e_3\}$ satisfying:
-$$e_i e_j + e_j e_i = 2 \delta_{ij}$$
-
-This yields an 8-dimensional graded multivector space:
+Generated by three orthonormal basis vectors $\{e_1, e_2, e_3\}$ with $e_i e_j + e_j e_i = 2 \delta_{ij}$, the algebra forms an 8-dimensional graded vector space:
 - **Grade 0 (Scalar)**: $1$
-- **Grade 1 (Vectors)**: $e_1, e_2, e_3$ (positions, translations, directions)
-- **Grade 2 (Bivectors)**: $e_{12} = e_1 \wedge e_2$, $e_{23} = e_2 \wedge e_3$, $e_{31} = e_3 \wedge e_1$ (oriented planes of rotation)
+- **Grade 1 (Vectors)**: $e_1, e_2, e_3$ (translations, positions, directions)
+- **Grade 2 (Bivectors)**: $e_{12} = e_1 \wedge e_2$, $e_{23} = e_2 \wedge e_3$, $e_{31} = e_3 \wedge e_1$ (oriented planes)
 - **Grade 3 (Pseudoscalar)**: $I = e_1 e_2 e_3$ (volume element, $I^2 = -1$)
 
-### Rotors and Motors
+### 3.2 Rotors and Planar Rotations
 
-A rotation of angle $\theta$ in an arbitrary oriented plane represented by unit 2-blade $B$ ($B^2 = -1$) is generated by a **Rotor**:
+A rotation through angle $\theta$ in an oriented plane represented by unit 2-blade $B$ ($B^2 = -1$) is defined by the **Rotor**:
 $$R = \exp\left(-\frac{\theta}{2} B\right) = \cos\left(\frac{\theta}{2}\right) - B \sin\left(\frac{\theta}{2}\right)$$
 
-Any vector $\mathbf{v}$ is rotated via the sandwich product:
+A vector $\mathbf{v}$ is rotated via the sandwich operator:
 $$\mathbf{v}' = R \mathbf{v} \widetilde{R}$$
 where $\widetilde{R}$ is the reversion of $R$.
 
-Rigid spatial displacements (rotations followed by translations by displacement vector $\mathbf{d}$) are composed into a unified **Motor** $M = T R$ where $T = 1 + \frac{1}{2}\mathbf{d}$ in projective geometric algebra $\mathbb{R}_{3,0,1}$:
-$$\mathbf{v}' = M \mathbf{v} \widetilde{M}$$
+Orientations in VizDL are expressed through three planar rotations:
+$$\text{rotation} = [\theta_{xy}, \theta_{yz}, \theta_{xz}]$$
+corresponding to the $e_{12}$, $e_{23}$, and $e_{31}$ bivector planes. Composing these planar rotors avoids coordinate singularities and gimbal lock across all orientations.
 
-**Benefits in VizDL**:
-- Zero gimbal lock across all spatial orientations.
-- Coordinate-free composition: Rotations do not depend on external coordinate axes.
-- Direct planar angle representation: Rotations in the $xy$ ($e_{12}$), $yz$ ($e_{23}$), and $xz$ ($e_{31}$) planes compose without singularity.
+### 3.3 Motor Formulation
+
+Rigid spatial displacements (rotations combined with linear translations $\mathbf{d}$) compose into a **Motor** $M = T R$ in projective geometric algebra $\mathbb{R}_{3,0,1}$, acting on geometric elements via $\mathbf{v}' = M \mathbf{v} \widetilde{M}$.
 
 ---
 
-## 4. Principle III: The Condensed-Matter Physical Triad
+## 4. Material Model: The Condensed-Matter Triad
 
-In VizDL, materials **do not have arbitrary RGB paint colors**. Instead, matter is defined from first principles through a normalized condensed-matter triad $(E_g, \rho_e, \sigma) \in [0.0, 1.0]^3$, augmented by electronic excitation $\epsilon \in [0.0, 1.0]$.
+Materials in VizDL do not use heuristic surface paint colors. Instead, materials are defined by physical condensed-matter parameters normalized to the unit interval $[0.0, 1.0]$:
 
-```
-                    Condensed-Matter Material
-                                |
-        +-----------------------+-----------------------+
-        |                       |                       |
-        v                       v                       v
- Bandgap Energy          Electron Density          Roughness
-   Eg in [0, 1]           rho_e in [0, 1]         sigma in [0, 1]
- (Optics: Metals /     (Refraction: Glass vs     (Microfacets:
-  Dielectrics)              Opaque Bulk)          Mirror vs Diffuse)
-        |                       |                       |
-        +-----------------------+-----------------------+
-                                |
-                                v
-               Strict Energy Conservation: R + T + A = 1.0
-                                +
-               Resonant Luminescence: Excitation epsilon in [0, 1]
-```
+$$\text{Material} = (E_g, \rho_e, \sigma) \in [0.0, 1.0]^3$$
 
-### 4.1 Bandgap Energy $E_g \in [0.0, 1.0]$
+### 4.1 Bandgap Energy ($E_g \in [0.0, 1.0]$)
 
-Governs the quantum electronic excitation energy required to promote an electron across the forbidden bandgap into the conduction band:
+The bandgap energy specifies the optical absorption threshold:
 
-- **$E_g \le 0.05$ (Drude Metallic Conductor)**:
-  Zero or near-zero bandgap. Free electrons form a Fermi-Dirac plasma sea.
-  - Electromagnetic waves cannot penetrate the plasma below the plasma frequency $\omega_p$.
-  - Bulk transmission is strictly zero: $T = 0.0$.
-  - Reflectivity is driven by Drude metallic plasma reflection:
+- **Conductor / Metallic Regime ($E_g \le 0.05$)**:
+  Conduction electrons form a Fermi-Dirac plasma sea.
+  - Bulk transmission is zero: $T = 0.0$.
+  - Surface reflection follows Drude plasma reflectance:
     $$R_{\text{metal}} = 0.85 + 0.10 \rho_e \in [0.85, 0.98]$$
   - Conductor absorption: $A = 1.0 - R_{\text{metal}}$.
-- **$E_g > 0.05$ (Dielectric / Semiconductor)**:
-  Non-zero bandgap. Absorption occurs only for photons whose energy exceeds the bandgap:
+- **Dielectric / Semiconductor Regime ($E_g > 0.05$)**:
+  Electrons are localized in the valence band. Optical absorption occurs only for photon energies exceeding $E_g$:
   $$h\nu \ge E_g \implies \lambda \le \frac{hc}{E_g}$$
-  - For wide bandgaps ($E_g \ge 0.90$), all visible photons ($1.8 - 3.1\text{ eV}$) pass without absorption, yielding crystal/glass transparency.
-  - For narrow bandgaps ($0.05 < E_g < 0.90$), short wavelengths (blue/green) are absorbed while long wavelengths (red) pass or scatter, naturally producing deep physical colors without arbitrary RGB overrides.
+  - Wide bandgap ($E_g \ge 0.90$): Visible photons pass unabsorbed, yielding crystal and glass transmission.
+  - Narrow bandgap ($0.05 < E_g < 0.90$): Short-wavelength photons are absorbed while longer wavelengths scatter or transmit, yielding physical coloration from electronic band structure.
 
-### 4.2 Electron Density $\rho_e \in [0.0, 1.0]$
+### 4.2 Electron Density ($\rho_e \in [0.0, 1.0]$)
 
-Governs the polarizability and refractive index $n$ according to the Lorentz-Lorenz / Maxwell relation:
-
+Governs material polarizability and refractive index $n$ according to the Lorentz-Lorenz relation:
 $$n = \sqrt{1 + 1.42 \rho_e}$$
 
-- Normal-incidence Fresnel reflection:
-  $$R_0 = \left(\frac{n - 1}{n + 1}\right)^2$$
-- **$\rho_e \le 0.40$ (Transmissive Optical Medium)**:
-  Low bulk scattering. Media with $\rho_e \le 0.40$ act as clear, tinted, or frosted transmissive optical bodies (glass, quartz, diamond, amber resin).
-- **$\rho_e > 0.40$ (Bulk Scattering Opaque Medium)**:
-  High valence electron density causes multiple internal scattering, extinguishing direct transmission: $T = 0.0, \text{Opacity} = 1.0$ (plastics, ceramics, stones, opaque coatings).
+Normal-incidence Fresnel reflectance is:
+$$R_0 = \left(\frac{n - 1}{n + 1}\right)^2$$
 
-### 4.3 Surface Roughness $\sigma \in [0.0, 1.0]$
+- **Transmissive Medium ($\rho_e \le 0.40$)**: Low valence electron density yields minimal internal scattering. Materials function as clear or tinted transmissive media (e.g. glass, quartz, resin).
+- **Bulk Scattering Opaque Medium ($\rho_e > 0.40$)**: High electron density causes multiple internal scattering, extinguishing direct transmission ($T = 0.0, \text{Opacity} = 1.0$) as in ceramics, dense polymers, and stones.
 
-Represents the root-mean-square microfacet slope variance $\sigma = \alpha_{\text{GGX}}$ in the Cook-Torrance microfacet distribution:
-- $\sigma = 0.0$: Optically smooth mirror specular reflection.
-- $\sigma = 1.0$: Fully diffuse Lambertian scattering.
+### 4.3 Surface Microfacet Roughness ($\sigma \in [0.0, 1.0]$)
 
-### 4.4 Strict Conservation of Energy
+Corresponds to the microfacet slope variance $\alpha_{\text{GGX}}$ in the Cook-Torrance distribution:
+- $\sigma = 0.0$: Specular reflection.
+- $\sigma = 1.0$: Diffuse scattering.
 
-Under all incident illumination:
+### 4.4 Thermodynamic Energy Conservation
+
+Under all incident illumination conditions:
 $$R_{\text{total}} + T + A = 1.0$$
-Energy is never created or destroyed.
+Energy is strictly conserved across all optical interfaces.
 
 ---
 
-## 5. Principle IV: Unified Radiance ("Light is Material with Glow")
+## 5. Radiance Model: Matter-Bound Luminescence
 
-In classical CGI, lights are defined as artificial abstractions (`PointLight`, `SpotLight`, `DirectionalLight`) disconnected from scene geometry.
+In VizDL, illumination is an intrinsic property of matter rather than an independent geometric primitive.
 
-**VizDL Axiom**: **Light is excited material.**
-
-Every luminaire in the universe is a physical body composed of matter whose electrons are pumped into an excited state. VizDL formalizes this through the **Excitation** parameter $\epsilon \in [0.0, 1.0]$:
-
+A luminaire is an object whose material possesses a non-zero electronic excitation $\epsilon \in [0.0, 1.0]$:
 $$\Phi_e = \epsilon \cdot L_{\max}$$
 
-- When $\epsilon = 0.0$: The material is in its ground state, purely passive ($R + T + A = 1.0$).
-- When $\epsilon > 0.0$: The material emits resonant luminescence at its characteristic bandgap wavelength $\lambda_0 = hc/E_g$.
-- Self-illuminating objects naturally cast radiance onto surrounding geometry in the rendering engine through path tracing and radiant field sampling.
+- When $\epsilon = 0.0$: The material is in its thermodynamic ground state ($R + T + A = 1.0$).
+- When $\epsilon > 0.0$: Non-thermal electronic pumping induces resonant luminescence centered at bandgap wavelength $\lambda_0 = hc/E_g$.
+
+External artificial light primitives (`point`, `directional`, `spot`) are absent from the model; all scene radiance originates from geometric objects composed of excited matter.
 
 ---
 
-## 6. Principle V: The Four Pillars of Kinematics
+## 6. Kinematic Model: The Four Transformations
 
-All motion, evolution, and time-dependent phenomena in VizDL are strictly categorized into four orthogonal physical transformations:
+Kinematic transformations across time $t \in [0, T]$ are partitioned into four orthogonal categories:
 
-```
-                          The 4 Pillars of Kinematics
-                                       |
-    +------------------+---------------+---------------+------------------+
-    |                  |                               |                  |
-    v                  v                               v                  v
-1. Sweep          2. Revolve                      3. Morph           4. Excitation
-Trajectory        Axis & Orbital                  Congruent Mesh     Quantum Electronic
-Traversal         Revolution                      Topological Blend  Pumping / Glow
-```
-
-### Pillar 1: Trajectory Sweep
-Movement of an object or camera along a 3D intrinsic trajectory curve $\mathbf{r}(s)$ defined in `profiles/*.toml`:
-$$\mathbf{p}(t) = \mathbf{r}\left(s(u(t))\right)$$
-where $u(t) \in [0, 1]$ is progression modulated by an intrinsic timing profile.
-
-### Pillar 2: Axis Revolution
-Continuous rotation of an object or camera around a directional axis unit vector $\hat{\mathbf{n}}$ with radial offset $r$:
-$$R(t) = \exp\left(-\frac{\theta(t)}{2} I \hat{\mathbf{n}}\right)$$
-
-### Pillar 3: Shape Morphing
-Topological manifold interpolation between congruent mesh geometries $\mathbf{M}_A$ and $\mathbf{M}_B$:
-$$\mathbf{M}(t) = (1 - \alpha(t)) \mathbf{M}_A + \alpha(t) \mathbf{M}_B, \quad \alpha(t) \in [0, 1]$$
-
-### Pillar 4: Excitation Modulation
-Quantum pumping level $\epsilon(t) \in [0.0, 1.0]$ modulated over time from `start` to `end` via an intrinsic timing curve, causing radiant pulsing, glowing signals, and illumination surges.
+1. **Trajectory Sweep**:
+   Translation of an object or camera along an intrinsic 3D curve profile $\mathbf{r}(s)$:
+   $$\mathbf{p}(t) = \mathbf{r}\left(s(u(t))\right)$$
+   where $u(t) \in [0, 1]$ is progression governed by an intrinsic pacing curve.
+2. **Axis Revolution**:
+   Rotation of an object or camera around a directional unit vector $\hat{\mathbf{n}}$ with radial offset $r$:
+   $$R(t) = \exp\left(-\frac{\theta(t)}{2} I \hat{\mathbf{n}}\right)$$
+3. **Shape Morphing**:
+   Manifold interpolation between two congruent mesh assemblies $\mathbf{M}_A$ and $\mathbf{M}_B$:
+   $$\mathbf{M}(t) = (1 - \alpha(t)) \mathbf{M}_A + \alpha(t) \mathbf{M}_B, \quad \alpha(t) \in [0, 1]$$
+4. **Excitation Modulation**:
+   Temporal modulation of electronic pumping level $\epsilon(t) \in [0.0, 1.0]$ from `start` to `end` via a pacing curve.
 
 ---
 
-## 7. Principle VI: Compositional Referential Integrity
+## 7. Composition and Identity Model
 
-In VizDL, every profile, material, mesh, object, component, animation, and scene entity has a mandatory, unique identifier:
-
+VizDL enforces strict referential composition through mandatory identifiers:
 ```toml
-name = "<string>" # Required everywhere
+name = "<string>" # Required across all entities
 ```
 
-Composition is strictly referential:
-- A **Mesh** references a profile by `surface = "<profile_name>"` and `curve = "<trajectory_name>"`.
-- An **Object Component** references a mesh by `mesh = "<mesh_name>"` and an optional material by `material = "<material_name>"`.
-- An **Animation** references a curve profile by `path = "<trajectory_name>"` and a target object by `target_object = "<object_name>"`.
-- A **Scene** references objects by `object = "<object_name>"` and animations by `animation = "<animation_name>"`.
+The composition model forms a directed acyclic graph:
+- **Meshes** reference cross-section profiles and trajectory profiles.
+- **Objects** reference meshes and materials.
+- **Animations** reference trajectory curves and target objects.
+- **Scenes** reference placed objects and animations.
 
-This graph topology ensures complete modularity: components can be recombined, trajectories can be swapped, and materials can be updated across entire assemblies with deterministic guarantees.
+Each entity retains independent modular identity, enabling reuse, structural validation, and deterministic scene evaluation.

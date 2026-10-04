@@ -6,7 +6,7 @@ Materials define passive matter and self-radiant active matter from first-princi
 
 ## 1. The Condensed-Matter Triad
 
-VizDL completely eliminates arbitrary RGB surface color overrides. Physical matter has atomic and electronic structure, not paint tags. All material properties are normalized to the unit interval `[0.0, 1.0]`:
+In VizDL, materials are defined by physical condensed-matter parameters rather than RGB surface colors. All material properties are normalized to the unit interval `[0.0, 1.0]`:
 
 ```toml
 name = "<string>"                 # Required. Unique material identifier.
