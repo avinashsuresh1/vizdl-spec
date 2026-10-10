@@ -12,7 +12,7 @@ VizDL describes 3D scenes using a few foundational concepts:
 
 1. **Curves Defined by Curvature**: Instead of placing control points, curves are described by how much they bend along their length. A straight line has zero curvature, a circle has constant curvature, and a spiral bends progressively.
 2. **Surfaces from Curves**: 3D shapes are created either by sweeping a 2D profile along a curve or by revolving it around an axis.
-3. **Materials from Physical Properties**: Rather than picking arbitrary RGB colors, materials are defined by basic physical properties (energy gap, electron density, roughness) normalized between 0 and 1. Materials obey conservation of energy ($R + T + A = 1$).
+3. **Materials from Physical Properties**: Rather than picking arbitrary RGB colors, materials are defined by basic physical properties (energy gap, electron density, roughness, excitation) representing real condensed-matter quantities calibrated to global physical boundaries declared in `visual.toml`. Materials obey conservation of energy ($R + T + A = 1$).
 4. **Light as Glowing Matter**: Light is emitted directly by objects whose materials have an excitation value greater than zero, rather than through standalone light entities.
 5. **Animation Through Four Core Motions**: Movement is organized into four basic types: sweeping along a path, revolving around an axis, morphing between shapes, and changing a material's glow.
 6. **Clear Identifiers**: Every curve, material, mesh, object, and animation has a mandatory `name` so parts can reference one another reliably.
@@ -36,10 +36,11 @@ VizDL describes 3D scenes using a few foundational concepts:
 
 ## Project Layout
 
-A standard VizDL project organizes files into six folders:
+A standard VizDL project organizes files with a global physical configuration and modular subdirectories:
 
 ```
 project/
+├── visual.toml   # Global physical scale boundaries (energy gap, electron density, roughness, excitation)
 ├── profiles/     # 2D cross-sections and 3D paths
 ├── materials/    # Physical material definitions
 ├── meshes/       # 3D shapes made by sweep or revolve

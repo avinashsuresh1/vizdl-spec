@@ -58,34 +58,48 @@ Behind the scenes, these planar rotations map to **rotors** in 3D Geometric Alge
 
 ## 4. Materials and the Physical Triad
 
-In VizDL, materials do not use arbitrary RGB color pickers. Instead, material appearance comes from three physical properties, each normalized between **0.0 and 1.0**:
+In VizDL, materials do not use arbitrary RGB color pickers. Instead, material appearance comes from four foundational physical properties that represent real condensed-matter quantities:
 
 ```toml
 [materials]
-energy_gap = <f64>        # Bandgap energy: determines metal vs dielectric
-electron_density = <f64>  # Density: determines refractive index and transparency
-roughness = <f64>         # Microfacet roughness: determines mirror vs diffuse
-excitation = <f64>        # Optional: electronic pumping that makes material glow
+energy_gap = <f64>        # Bandgap energy: determines metal vs dielectric (eV)
+electron_density = <f64>  # Conduction/valence density: determines refractive index and opacity (10^28 m^-3)
+roughness = <f64>         # Microfacet RMS slope: determines mirror specular vs diffuse scatter
+excitation = <f64>        # Optional: fractional electronic pumping that makes material glow
 ```
 
-### 4.1 Energy Gap ($E_g \in [0.0, 1.0]$)
-The energy gap represents the threshold needed to excite an electron:
-- **Metals / Conductors ($E_g \le 0.05$)**: The material has free electrons that form a reflective surface. Light cannot pass through ($T = 0$), resulting in strong metallic reflection ($R \approx 0.85 - 0.98$).
-- **Dielectrics / Insulators ($E_g > 0.05$)**: Electrons are held in place. Photons with energy lower than the gap pass through freely:
-  - *Wide gap ($E_g \ge 0.90$)*: All visible light passes through, producing transparent glass, crystal, or quartz.
-  - *Narrower gap ($0.05 < E_g < 0.90$)*: Higher-energy blue and green photons are absorbed while lower-energy red photons pass through or scatter, producing natural material colors like amber, gold, or crimson.
+### 4.1 Physical Reality and `visual.toml` Normalization
+Configuration in VizDL is not a collection of arbitrary abstract sliders—it represents physical reality. To allow materials to be specified either in normalized dimensionless units $[0.0, 1.0]$ or in raw physical numbers, VizDL defines the physical domain boundaries via `visual.toml`:
 
-### 4.2 Electron Density ($\rho_e \in [0.0, 1.0]$)
-Electron density determines how strongly light bends when entering the material (refractive index $n = \sqrt{1 + 1.42 \rho_e}$):
-- **Clear / Transmissive ($\rho_e \le 0.40$)**: Low density allows light to travel through clearly (glasses, resins, crystals).
-- **Opaque Bulk ($\rho_e > 0.40$)**: Higher density causes light to scatter repeatedly inside the material, making it opaque ($T = 0$) like ceramics, stones, and dense plastics.
+$$u = \frac{x - \min}{\max - \min} \iff x = \min + u \cdot (\max - \min)$$
 
-### 4.3 Surface Roughness ($\sigma \in [0.0, 1.0]$)
-Controls how smooth the surface is:
+Implementations provide clearly labelled code-level defaults, while a workspace `visual.toml` strictly overrides them when present. The default physical maxima are designed to be clean, memorable integers:
+
+| Property | Default Domain | Physical Unit | Physical Scale Rationale |
+| :--- | :--- | :--- | :--- |
+| **`energy_gap`** | $[0.0, \mathbf{10.0}]$ | $\text{eV}$ | Spans metals ($0.0\text{ eV}$), visible semiconductors ($1.1 - 2.5\text{ eV}$), diamond ($5.5\text{ eV}$), and fused quartz ($\sim 9.0\text{ eV}$) up to deep-UV optical insulators ($10.0\text{ eV}$). |
+| **`electron_density`** | $[0.0, \mathbf{20.0}]$ | $10^{28}\text{ m}^{-3}$ | Atomic packing scale ($\sim 10^{28}\text{ atoms/m}^3$). Captures vacuum ($0.0$), gold ($5.9$), and dense conductors like aluminum ($18.1$). |
+| **`roughness`** | $[0.0, \mathbf{1.0}]$ | dimensionless | Microfacet RMS slope $\alpha$: atomically flat specular mirror ($0.0$) to Lambertian diffuse ($1.0$). |
+| **`excitation`** | $[0.0, \mathbf{1.0}]$ | dimensionless | Fractional population inversion $N_{\text{excited}} / N_{\text{total}}$: ground state ($0.0$) to complete inversion ($1.0$). |
+
+### 4.2 Energy Gap ($E_g$)
+The bandgap energy represents the quantum threshold needed to excite an electron into the conduction band:
+- **Metals / Conductors ($E_g \le 0.05$ or $\le 0.5\text{ eV}$)**: The material has free electrons forming a Fermi-Dirac plasma sea. Light cannot penetrate ($T = 0$), resulting in strong metallic reflection ($R \approx 0.85 - 0.98$).
+- **Dielectrics / Insulators ($E_g > 0.05$ or $> 0.5\text{ eV}$)**: Electrons are bound. Photons with energy lower than the gap pass through freely:
+  - *Wide gap ($E_g \ge 0.90$ or $\ge 9.0\text{ eV}$)*: All visible light passes through without absorption, producing transparent glass, crystal, or quartz.
+  - *Narrower gap ($0.05 < E_g < 0.90$)*: Higher-energy blue and green photons are absorbed while lower-energy red photons scatter or transmit, producing rich natural material colors like amber, gold, or crimson.
+
+### 4.3 Electron Density ($\rho_e$)
+Governs how strongly light refracts when entering the material (refractive index $n = \sqrt{1 + 1.42 \rho_e}$):
+- **Clear / Transmissive ($\rho_e \le 0.40$ or $\le 8.0 \times 10^{28}\text{ m}^{-3}$)**: Low valence electron density produces low internal scattering. Materials act as transmissive optical bodies (glasses, resins, crystals).
+- **Opaque Bulk ($\rho_e > 0.40$ or $> 8.0 \times 10^{28}\text{ m}^{-3}$)**: Higher density causes light to scatter repeatedly inside the material, extinguishing transmission ($T = 0$) like ceramics, stones, and dense plastics.
+
+### 4.4 Surface Roughness ($\sigma$)
+Controls microfacet root-mean-square slope variance $\alpha_{\text{GGX}}$:
 - $\sigma = 0.0$: Perfectly smooth, mirror-like specular reflections.
-- $\sigma = 1.0$: Rough surface with soft, diffuse scattering.
+- $\sigma = 1.0$: Fully diffuse Lambertian scatterer.
 
-### 4.4 Conservation of Energy
+### 4.5 Conservation of Energy
 Under all circumstances, materials follow thermodynamic conservation:
 $$\text{Reflected} + \text{Transmitted} + \text{Absorbed} = 1.0$$
 Energy is never artificially created or lost.

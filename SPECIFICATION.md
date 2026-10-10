@@ -4,6 +4,47 @@ The authoritative, exhaustive declarative TOML specification for VizDL (Visual D
 
 ---
 
+## 0. Physical Domain Configuration (`visual.toml`)
+
+Defines the global physical scale boundaries for condensed-matter properties within a VizDL workspace.
+Properties represent real physical quantities; implementations normalize them to dimensionless intervals $[0.0, 1.0]$ based on these bounds:
+
+$$u = \frac{x - \min}{\max - \min} \iff x = \min + u \cdot (\max - \min)$$
+
+### 0.1 Schema
+```toml
+name = "<string>"                 # Optional. Configuration name (default: "VisualWorld").
+description = "<string>"          # Optional. Description of physical domain scale.
+
+[properties.energy_gap]           # Bandgap energy domain
+min = <f64>                       # Minimum bandgap in eV (default: 0.0 eV, metallic plasma).
+max = <f64>                       # Maximum bandgap in eV (default: 10.0 eV, deep-UV insulator cutoff).
+
+[properties.electron_density]     # Valence/conduction electron density domain
+min = <f64>                       # Minimum electron density in 10^28 m^-3 (default: 0.0, vacuum).
+max = <f64>                       # Maximum electron density in 10^28 m^-3 (default: 20.0, dense conductor packing).
+
+[properties.roughness]            # Microfacet surface roughness domain
+min = <f64>                       # Minimum RMS slope alpha (default: 0.0, specular mirror).
+max = <f64>                       # Maximum RMS slope alpha (default: 1.0, Lambertian diffuse).
+
+[properties.excitation]           # Resonant electronic excitation domain
+min = <f64>                       # Minimum fractional population (default: 0.0, ground state).
+max = <f64>                       # Maximum fractional population (default: 1.0, complete population inversion).
+```
+
+### 0.2 Standard Physical Defaults
+Implementations MUST define clearly labelled code-level defaults. When a `visual.toml` configuration file is present at the workspace root, its values strictly override these defaults:
+
+| Property | Default Min | Default Max | Physical Unit | Physical Scale Meaning |
+| :--- | :--- | :--- | :--- | :--- |
+| `energy_gap` | `0.0` | `10.0` | $\text{eV}$ | Metals ($0\text{ eV}$) to deep-UV optical insulators ($\le 10\text{ eV}$) |
+| `electron_density` | `0.0` | `20.0` | $10^{28}\text{ m}^{-3}$ | Atomic packing scale: vacuum ($0$) to dense conductors (Al at $18.1$) |
+| `roughness` | `0.0` | `1.0` | dimensionless | Microfacet RMS slope $\alpha$: specular ($0$) to Lambertian ($1$) |
+| `excitation` | `0.0` | `1.0` | dimensionless | Fractional population $N_{\text{excited}} / N_{\text{total}}$: ground ($0$) to inversion ($1$) |
+
+---
+
 ## 1. Profiles (`profiles/*.toml`)
 
 Defines 2D cross-sections, 3D trajectory paths, or 1D/2D timing curves via intrinsic curvature polynomials:
@@ -52,16 +93,20 @@ curvature = <f64> | [<f64>, ...] | [{ power = <u32>, coeff = <f64> }, ...] # Req
 
 ## 2. Materials (`materials/*.toml`)
 
-Defines optical and condensed-matter physical properties. All parameters normalized to `[0.0, 1.0]`.
-Light emission is defined by electronic excitation ($\epsilon > 0.0$).
+Defines optical and condensed-matter physical properties from first principles.
+Properties represent physical quantities. In `materials/*.toml`, properties can be declared either:
+1. **Normalized**: Dimensionless fractions in $[0.0, 1.0]$, mapped to physical space via the domain bounds $[ \min, \max ]$ declared in `visual.toml` (or standard defaults).
+2. **Physical**: Raw physical values ($x > 1.0$), which implementations normalize according to $u = \frac{x - \min}{\max - \min}$.
+
+Light emission is defined by electronic excitation ($\epsilon > 0.0$); no external light entities exist.
 
 ```toml
 name = "<string>"                 # Required. Unique material identifier.
 description = "<string>"          # Optional.
-energy_gap = <f64>                # Required. Range: [0.0, 1.0]. Normalized bandgap energy.
-electron_density = <f64>          # Required. Range: [0.0, 1.0]. Normalized electron density.
-roughness = <f64>                 # Required. Range: [0.0, 1.0]. Normalized microfacet roughness.
-excitation = <f64>                # Optional. Default: 0.0. Range: [0.0, 1.0]. Normalized electronic excitation level (glow emission).
+energy_gap = <f64>                # Required. Bandgap energy. Normalized [0.0, 1.0] or physical eV (default max: 10.0 eV).
+electron_density = <f64>          # Required. Electron density. Normalized [0.0, 1.0] or physical 10^28 m^-3 (default max: 20.0).
+roughness = <f64>                 # Required. Microfacet roughness RMS slope alpha [0.0, 1.0].
+excitation = <f64>                # Optional. Default: 0.0. Normalized electronic excitation level (glow emission) [0.0, 1.0].
 ```
 
 ---
