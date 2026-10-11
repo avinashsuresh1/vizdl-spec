@@ -1,6 +1,6 @@
 # VizDL TOML Schema Specification (Version 1.0)
 
-The authoritative, exhaustive declarative TOML specification for VizDL (Visual Design Language) Version 1.0.
+The complete declarative TOML specification for VizDL (Visual Design Language) Version 1.0.
 
 ---
 
